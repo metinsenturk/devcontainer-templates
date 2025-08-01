@@ -1,9 +1,9 @@
 {
-    "id": "color",
+    "id": "color2",
     "version": "1.0.0",
     "name": "My Favorite Color",
     "description": "A Template to remind you of your favorite color",
-    "documentationURL": "https://github.com/devcontainers/template-starter/tree/main/src/color",
+    "documentationURL": "https://github.com/devcontainers/template-starter/tree/main/src/color2",
     "licenseURL": "https://github.com/devcontainers/template-starter/blob/main/LICENSE",
     "options": {
         "imageVariant": {
