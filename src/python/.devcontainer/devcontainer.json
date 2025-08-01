@@ -1,0 +1,12 @@
+{
+	"name": "Python ${templateOption:imageVariant}",
+	"image": "simple-python:${templateOption:imageVariant}",
+	
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python"
+			]
+		}
+	}
+}
