@@ -21,7 +21,8 @@
   "remoteEnv": {
     "PROJECT_NAME": "${templateOption:projectName}",
     "PYTHON_VERSION": "${templateOption:pythonVersion}",
-    "UV_INIT_BARE": "${templateOption:bare}"
+    "UV_INIT_BARE": "${templateOption:bare}",
+    "INSTALL_IPYKERNEL": "${templateOption:useJupyter}"
   },
   "postCreateCommand": "make post-create",
   "mounts": []

@@ -1,7 +1,7 @@
 .PHONY: post-create test-tools init sync lint format type-check
 
 # Post-create command: run tool verification, init project, and sync dependencies
-post-create: test-tools init sync
+post-create: test-tools init ensure-ipykernel sync
 
 # Initialize Python environment with uv and create pyproject.toml if needed
 init:
@@ -15,6 +15,22 @@ init:
 		fi; \
 	fi) > /tmp/init.log 2>&1
 	@echo "✓ Initialization complete (log: /tmp/init.log)"
+
+# Ensure ipykernel is installed as a dev dependency (optional)
+ensure-ipykernel:
+	@if [ "${INSTALL_IPYKERNEL}" = "true" ]; then \
+		( \
+			if ! uv run python -c "import ipykernel" >/dev/null 2>&1; then \
+				echo "Installing ipykernel (dev dependency)..."; \
+				uv add --dev ipykernel; \
+			else \
+				echo "ipykernel already present; skipping installation."; \
+			fi \
+		) > /tmp/jupyter-kernel.log 2>&1; \
+		echo "✓ ipykernel check complete (log: /tmp/jupyter-kernel.log)"; \
+	else \
+		echo "Skipping ipykernel installation (INSTALL_IPYKERNEL != true)"; \
+	fi
 
 # Verify installed tools
 test-tools:

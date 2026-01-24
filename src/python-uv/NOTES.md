@@ -4,7 +4,7 @@
 - Devcontainer-based Python setup with `uv` managing environments and dependencies (`pyproject.toml` + `uv.lock`).
 - VS Code + Pylance plus pre-installed extensions: Ruff (lint/format/imports), Mypy (types), Jupyter.
 - Post-create flow: verifies tools → installs Python → initializes project (if needed) → syncs dependencies.
-- Logs available at `/tmp/test-tools.log`, `/tmp/init.log`, and `/tmp/uv-sync.log` for debugging post-create issues.
+- Logs available at `/tmp/test-tools.log`, `/tmp/init.log`, `/tmp/jupyter-kernel.log`, and `/tmp/uv-sync.log` for debugging post-create issues.
 
 ## Devcontainer Setup
 - Base: Ubuntu image (`mcr.microsoft.com/devcontainers/base:ubuntu`) with `uv` feature for fast, reproducible environments.
@@ -14,12 +14,13 @@
 - Devcontainer config in `.devcontainer/devcontainer.json`:
   - Extensions: Python, Pylance, Ruff, Mypy, Jupyter
   - Post-create command: `make post-create`
-  - Environment variables: `PROJECT_NAME`, `PYTHON_VERSION`, `UV_INIT_BARE`
+  - Environment variables: `PROJECT_NAME`, `PYTHON_VERSION`, `UV_INIT_BARE`, `INSTALL_IPYKERNEL` (set from `useJupyter`)
 
 ## Makefile Commands
 The template includes a `Makefile` with the following targets:
 
-- `make post-create`: Full initialization sequence (test-tools → init → sync)
+- `make post-create`: Full initialization sequence (test-tools → init → ensure-ipykernel → sync)
+- `make ensure-ipykernel`: Installs `ipykernel` as a dev dependency only if missing (controlled via `INSTALL_IPYKERNEL`) → logs to `/tmp/jupyter-kernel.log`
 - `make test-tools`: Verifies installed tools (uv, Python, bash, git, etc.) → logs to `/tmp/test-tools.log`
 - `make init`: Installs Python via `uv python install`, creates minimal `pyproject.toml` if missing (uses `--bare` by default) → logs to `/tmp/init.log`
 - `make sync`: Runs `uv sync` to install dependencies → logs to `/tmp/uv-sync.log`
@@ -57,6 +58,7 @@ The template includes a `Makefile` with the following targets:
 - `imageName`: Docker image/container name (default: "python_playground")
 - `pythonVersion`: Python version to install (default: "3.13"; options: 3.11-3.14)
 - `bare`: Use minimal `uv init --bare` mode (default: true; creates only `pyproject.toml`)
+- `useJupyter`: Enable Jupyter notebooks; installs `ipykernel` during post-create (default: true)
 
 ## File Structure
 - `.devcontainer/devcontainer.json`: Container definition, extensions, environment variables, post-create command
