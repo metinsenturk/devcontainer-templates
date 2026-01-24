@@ -61,6 +61,7 @@ echo
 echo "=== Test Complete ==="
 
 # Final summary
-APP_NAME=${APP_NAME:-workspace}
-APP_VERSION=${APP_VERSION:-0.1.0}
-echo "✅ ${APP_NAME} - ${APP_VERSION}"
+PROJECT_NAME=${PROJECT_NAME:-Python + uv}
+echo "✅ Apps are ready for '${PROJECT_NAME}'"
+echo "   Using python-uv devcontainer template"
+echo "   https://github.com/metinsenturk/devcontainer-templates/tree/main/src/python-uv"

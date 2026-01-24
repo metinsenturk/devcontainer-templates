@@ -1,11 +1,16 @@
 {
     "id": "python-uv",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Python + uv",
     "description": "Python development environment with uv package manager (via devcontainers-extra feature).",
     "documentationURL": "https://github.com/metinsenturk/devcontainer-templates/tree/main/src/python-uv",
     "licenseURL": "https://github.com/metinsenturk/devcontainer-templates/blob/main/LICENSE",
     "options": {
+        "projectName": {
+            "type": "string",
+            "description": "Name for this project/workspace:",
+            "default": "Python + uv"
+        },
         "imageName": {
             "type": "string",
             "description": "Docker image name:",
