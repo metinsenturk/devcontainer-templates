@@ -42,6 +42,16 @@ The template includes a `Makefile` with the following targets:
   - `uv run` ensures commands execute in the managed `.venv`
 - Configuration: Add tool settings to `pyproject.toml` (e.g., `[tool.ruff]`, `[tool.mypy]`)
 
+## VS Code Configuration
+- `.vscode/settings.json` pre-configured with:
+  - **Formatter:** Ruff with format-on-save (automatic code formatting on every save)
+  - **Import organization:** Automatic import sorting on save (groups stdlib, third-party, local)
+  - **Auto-fixes:** Ruff fixable issues on save (unused imports, whitespace, etc.)
+  - **Interpreter:** `.venv/bin/python` (points to managed environment created by `uv sync`)
+  - **Type checking:** Mypy real-time feedback via mypy-type-checker extension
+  - **Tool configs:** Ruff and Mypy configured to read from `pyproject.toml` for consistency
+- **Result:** Real-time code quality feedback on save; no manual `make` commands needed for formatting/fixes
+
 ## Template Options
 - `projectName`: Workspace display name (default: "Python + uv")
 - `imageName`: Docker image/container name (default: "python_playground")
