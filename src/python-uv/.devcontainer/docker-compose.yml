@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: ${templateOption:imageName}
+    container_name: ${templateOption:imageName}
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
