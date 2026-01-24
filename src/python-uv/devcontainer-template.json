@@ -10,6 +10,17 @@
             "type": "string",
             "description": "Docker image name:",
             "default": "python_playground"
+        },
+        "pythonVersion": {
+            "type": "string",
+            "description": "Python version to install via uv:",
+            "proposals": [
+                "3.14",
+                "3.13",
+                "3.12",
+                "3.11"
+            ],
+            "default": "3.13"
         }
     },
     "platforms": [

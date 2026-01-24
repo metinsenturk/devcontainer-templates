@@ -7,6 +7,7 @@ Python development environment with uv package manager (via devcontainers-extra 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | imageName | Docker image name: | string | python_playground |
+| pythonVersion | Python version to install via uv: | string | 3.13 |
 
 
 

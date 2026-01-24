@@ -1,7 +1,13 @@
-.PHONY: post-create test-tools sync lint format type-check
+.PHONY: post-create test-tools init sync lint format type-check
 
-# Post-create command: run tool verification and dependency sync
-post-create: test-tools sync
+# Post-create command: run tool verification, init project, and sync dependencies
+post-create: test-tools init sync
+
+# Initialize Python environment with uv and create pyproject.toml if needed
+init:
+	@echo "Installing Python ${PYTHON_VERSION}..."
+	@uv python install ${PYTHON_VERSION}
+	@if [ ! -f pyproject.toml ]; then echo "Initializing project..."; uv init --python ${PYTHON_VERSION}; fi
 
 # Verify installed tools
 test-tools:

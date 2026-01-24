@@ -18,6 +18,9 @@
       ]
     }
   },
+  "remoteEnv": {
+    "PYTHON_VERSION": "${templateOption:pythonVersion}"
+  },
   "postCreateCommand": "make post-create",
   "mounts": []
 }
