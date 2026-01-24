@@ -5,16 +5,16 @@ post-create: test-tools init sync
 
 # Initialize Python environment with uv and create pyproject.toml if needed
 init:
-	@echo "Installing Python ${PYTHON_VERSION}..."
-	@uv python install ${PYTHON_VERSION}
-	@if [ ! -f pyproject.toml ]; then \
-		echo "Initializing project..."; \
+	@echo "Initializing Python environment..."
+	@(uv python install ${PYTHON_VERSION} && \
+	if [ ! -f pyproject.toml ]; then \
 		if [ "${UV_INIT_BARE}" = "true" ]; then \
 			uv init --bare --python ${PYTHON_VERSION}; \
 		else \
 			uv init --python ${PYTHON_VERSION}; \
 		fi; \
-	fi
+	fi) > /tmp/init.log 2>&1
+	@echo "✓ Initialization complete (log: /tmp/init.log)"
 
 # Verify installed tools
 test-tools:
