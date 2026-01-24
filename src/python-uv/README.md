@@ -8,6 +8,7 @@ Python development environment with uv package manager (via devcontainers-extra 
 |-----|-----|-----|-----|
 | imageName | Docker image name: | string | python_playground |
 | pythonVersion | Python version to install via uv: | string | 3.13 |
+| bare | Use --bare mode for uv init (minimal pyproject.toml only): | boolean | true |
 
 
 

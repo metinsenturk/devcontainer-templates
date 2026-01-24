@@ -7,7 +7,14 @@ post-create: test-tools init sync
 init:
 	@echo "Installing Python ${PYTHON_VERSION}..."
 	@uv python install ${PYTHON_VERSION}
-	@if [ ! -f pyproject.toml ]; then echo "Initializing project..."; uv init --python ${PYTHON_VERSION}; fi
+	@if [ ! -f pyproject.toml ]; then \
+		echo "Initializing project..."; \
+		if [ "${UV_INIT_BARE}" = "true" ]; then \
+			uv init --bare --python ${PYTHON_VERSION}; \
+		else \
+			uv init --python ${PYTHON_VERSION}; \
+		fi; \
+	fi
 
 # Verify installed tools
 test-tools:

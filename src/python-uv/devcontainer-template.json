@@ -21,6 +21,11 @@
                 "3.11"
             ],
             "default": "3.13"
+        },
+        "bare": {
+            "type": "boolean",
+            "description": "Use --bare mode for uv init (minimal pyproject.toml only):",
+            "default": true
         }
     },
     "platforms": [
