@@ -16,6 +16,7 @@ RUN apt-get update && \
         gnupg \
         build-essential \
         sudo \
+        zsh \
         pipx \
     && rm -rf /var/lib/apt/lists/*
 
@@ -35,6 +36,12 @@ RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
 USER $USERNAME
 WORKDIR /workspace
 
+# === Install Starship ===
+RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
+
+# === Configure Zsh with Starship ===
+RUN echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+
 # === Install Pipx Packages ===
 RUN pipx install virtualenv && \
     pipx install autopep8 && \
@@ -52,4 +59,4 @@ RUN pipx install virtualenv && \
 # === Update PATH for Pipx Binaries ===
 ENV PATH="/home/vscode/.local/bin:${PATH}"
 
-CMD ["/bin/bash"]
+CMD ["/bin/zsh"]

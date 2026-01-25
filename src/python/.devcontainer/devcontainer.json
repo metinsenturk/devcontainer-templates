@@ -1,11 +1,15 @@
 {
 	"name": "Python Development",
 	"image": "ghcr.io/metinsenturk/devcontainer-templates/simple-python:${templateOption:imageVariant}",
+	"workspaceFolder": "/workspace",
 	
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-python.python"
+				"ms-python.python",
+				"ms-python.isort",
+				"ms-python.autopep8",
+				"ms-python.mypy-type-checker"
 			]
 		}
 	}
