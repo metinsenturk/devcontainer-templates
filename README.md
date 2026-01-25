@@ -1,122 +1,53 @@
-# Dev Container Templates: Self Authoring Guide
+# Devcontainer Templates
 
-> This repo provides a starting point and example for creating your own custom [Dev Container Templates](https://containers.dev/implementors/templates), hosted for free on GitHub Container Registry.  The example in this repository follows the [Dev Container Template distribution specification](https://containers.dev/implementors/templates-distribution/).  
->
-> To provide feedback on the distribution spec, please leave a comment [on spec issue #71](https://github.com/devcontainers/spec/issues/71).
+Lightweight devcontainer templates for Python projects:
 
-## Repo and Template Structure
+- `python`: classic pip/venv on Ubuntu base
+- `python-uv`: uv-managed Python on Ubuntu base
 
-This repository contains a _collection_ of two Templates - `hello` and `color`. These Templates serve as simple template implementations which helps containerize the project. Similar to the [`devcontainers/templates`](https://github.com/devcontainers/templates) repo, this repository has a `src` folder.  Each Template has its own sub-folder, containing at least a `devcontainer-template.json` and `.devcontainer/devcontainer.json`. 
+## What's Here
 
+- Templates live under `src/` with their `.devcontainer` configs
+- Tests live under `test/` with per-template `test.sh` plus shared `test-utils`
+
+## How to Use
+
+### VS Code
+1) Open the Command Palette → “Dev Containers: Add Dev Container Configuration Files…”.
+2) Select where to add the configuration files (e.g., current workspace folder).
+3) Choose a container configuration template or select “Enter custom template ID”, then paste:
+	- `ghcr.io/metinsenturk/devcontainer-templates/python-uv:latest`
+4) Complete the questionnaire from the template (options and defaults).
+5) Optionally add more features when prompted.
+6) Finish and files will appear in the current folder.
+
+### CLI
 ```
-├── src
-│   ├── color
-│   │   ├── devcontainer-template.json
-│   │   └──| .devcontainer
-│   │      └── devcontainer.json
-│   ├── hello
-│   │   ├── devcontainer-template.json
-│   │   └──| .devcontainer
-│   │      ├── devcontainer.json
-│   │      └── Dockerfile
-|   ├── ...
-│   │   ├── devcontainer-template.json
-│   │   └──| .devcontainer
-│   │      └── devcontainer.json
-├── test
-│   ├── color
-│   │   └── test.sh
-│   ├── hello
-│   │   └── test.sh
-│   └──test-utils
-│      └── test-utils.sh
-...
+devcontainer templates apply --template-id ${TEMPLATE-ID} --template-repo https://github.com/metinsenturk/devcontainer-templates
 ```
 
-### Options
+## Template Highlights
 
-All available options for a Template should be declared in the `devcontainer-template.json`. The syntax for the `options` property can be found in the [devcontainer Template json properties reference](https://containers.dev/implementors/templates#devcontainer-templatejson-properties).
+| Template ID | Package manager | Python install | Extras |
+|-------------|-----------------|----------------|--------|
+| python      | pip + venv      | System Python  | VS Code Python + Pylance extensions |
+| python-uv   | uv              | `uv python install` (version option) | Makefile (`post-create`, `sync`, `lint`, `type-check`), optional Jupyter |
 
-For example, the `color` Template provides three possible options (`red`, `gold`, `green`), where the default value is set to "red".
+## Testing Locally
 
-```jsonc
-{
-    // ...
-    "options": {
-        "favorite": {
-            "type": "string",
-            "description": "Choose your favorite color.",
-            "proposals": [
-                "red",
-                "gold",
-                "green"
-            ],
-            "default": "red"
-        }
-    }
-}
-```
+Open this repository in its own Dev Container, then run the smoke tests per template.
 
-An [implementing tool](https://containers.dev/supporting#tools) will use the `options` property from [the documented Dev Container Template properties](https://containers.dev/implementors/templates#devcontainer-templatejson-properties) for customizing the Template. See [option resolution example](https://containers.dev/implementors/templates#option-resolution-example) for details.
-
-## Distributing Templates
-
-**Note**: *Allow GitHub Actions to create and approve pull requests* should be enabled in the repository's `Settings > Actions > General > Workflow permissions` for auto generation of `src/<template>/README.md` per Template (which merges any existing `src/<template>/NOTES.md`).
-
-### Versioning
-
-Templates are individually versioned by the `version` attribute in a Template's `devcontainer-template.json`. Templates are versioned according to the semver specification. More details can be found in [the Dev Container Template specification](https://containers.dev/implementors/templates-distribution/#versioning).
-
-### Publishing
-
-> NOTE: The Distribution spec can be [found here](https://containers.dev/implementors/templates-distribution/).  
->
-> While any registry [implementing the OCI Distribution spec](https://github.com/opencontainers/distribution-spec) can be used, this template will leverage GHCR (GitHub Container Registry) as the backing registry.
-
-Templates are source files packaged together that encode configuration for a complete development environment.
-
-This repo contains a GitHub Action [workflow](.github/workflows/release.yaml) that will publish each template to GHCR.  By default, each Template will be prefixed with the `<owner/<repo>` namespace.  For example, the two Templates in this repository can be referenced by an [implementing tool](https://containers.dev/supporting#tools) with:
+Note: The build step is required because it prepares `/tmp/${TEMPLATE-ID}` by copying the template sources, injecting the test assets into `test-project/`, installing the Dev Containers CLI, and starting the dev container. The test step then executes `test-project/test.sh` inside that running container.
 
 ```
-ghcr.io/devcontainers/template-starter/color:latest
-ghcr.io/devcontainers/template-starter/hello:latest
+./.github/actions/smoke-test/build.sh ${TEMPLATE-ID}
+./.github/actions/smoke-test/test.sh ${TEMPLATE-ID}
 ```
 
-The provided GitHub Action will also publish a third "metadata" package with just the namespace, eg: `ghcr.io/devcontainers/template-starter`. This contains information useful for tools aiding in Template discovery.
+## Publishing
 
-'`devcontainers/template-starter`' is known as the template collection namespace.
+Packages are published from this repo (see GitHub Packages/OCI artifacts for availability). To have templates show up in the VS Code UI, publish to GHCR and add your collection to the public index at containers.dev/templates.
 
-### Marking Template Public
+## License
 
-For your Template to be used, it currently needs to be available publicly. By default, OCI Artifacts in GHCR are marked as `private`. 
-
-To make them public, navigate to the Template's "package settings" page in GHCR, and set the visibility to 'public`. 
-
-```
-https://github.com/users/<owner>/packages/container/<repo>%2F<templateName>/settings
-```
-
-### Adding Templates to the Index
-
-Next you will need to add your Templates collection to our [public index](https://containers.dev/templates) so that other community members can find them. Just follow these steps once per collection you create:
-
-* Go to [github.com/devcontainers/devcontainers.github.io](https://github.com/devcontainers/devcontainers.github.io)
-     * This is the GitHub repo backing the [containers.dev](https://containers.dev/) spec site
-* Open a PR to modify the [collection-index.yml](https://github.com/devcontainers/devcontainers.github.io/blob/gh-pages/_data/collection-index.yml) file
-
-This index is from where [supporting tools](https://containers.dev/supporting) like [VS Code Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and [GitHub Codespaces](https://github.com/templates/codespaces) surface Templates for their Dev Container Creation Configuration UI.
-
-### Testing Templates
-
-This repo contains a GitHub Action [workflow](.github/workflows/test-pr.yaml) for testing the Templates. Similar to the [`devcontainers/templates`](https://github.com/devcontainers/templates) repo, this repository has a `test` folder.  Each Template has its own sub-folder, containing at least a `test.sh`.
-
-For running the tests locally, you would need to execute the following commands -
-
-```
-    ./.github/actions/smoke-test/build.sh ${TEMPLATE-ID} 
-    ./.github/actions/smoke-test/test.sh ${TEMPLATE-ID} 
-```
-
-### Updating Documentation
-
-This repo contains a GitHub Action [workflow](.github/workflows/release.yaml) that will automatically generate documentation (ie. `README.md`) for each Template. This file will be auto-generated from the `devcontainer-template.json` and `NOTES.md`.
+MIT
