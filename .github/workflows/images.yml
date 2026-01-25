@@ -88,7 +88,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run image tests
-        if: hashFiles(format('test/images/{0}/test.sh', matrix.image)) != ''
+        if: github.event_name == 'pull_request' && hashFiles(format('test/images/{0}/test.sh', matrix.image)) != ''
         run: |
           docker run --rm \
             -v ${{ github.workspace }}/test/images/${{ matrix.image }}:/tests \
