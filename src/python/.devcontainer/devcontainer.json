@@ -1,6 +1,6 @@
 {
-	"name": "Python ${templateOption:imageVariant}",
-	"image": "simple-python:${templateOption:imageVariant}",
+	"name": "Python Development",
+	"image": "ghcr.io/metinsenturk/devcontainer-templates/simple-python:${templateOption:imageVariant}",
 	
 	"customizations": {
 		"vscode": {

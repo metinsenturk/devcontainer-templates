@@ -2,7 +2,7 @@
     "id": "python",
     "version": "1.0.0",
     "name": "Python",
-    "description": "A Python development environment using official Python image.",
+    "description": "A Python development environment powered by the simple-python custom image.",
     "documentationURL": "https://github.com/metinsenturk/devcontainer-templates/tree/main/src/python",
     "licenseURL": "https://github.com/metinsenturk/devcontainer-templates/blob/main/LICENSE",
     "options": {
@@ -10,12 +10,8 @@
             "type": "string",
             "description": "Python version:",
             "proposals": [
-                "latest",
-                "3.12",
-                "3.11",
-                "3.10",
-                "3.9",
-                "3.8"
+                "3.13",
+                "latest"
             ],
             "default": "latest"
         }

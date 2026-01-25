@@ -7,8 +7,9 @@ Lightweight devcontainer templates for Python projects:
 
 ## What's Here
 
-- Templates live under `src/` with their `.devcontainer` configs
-- Tests live under `test/` with per-template `test.sh` plus shared `test-utils`
+- **Templates** live under `src/` with their `.devcontainer` configs
+- **Tests** live under `test/` with per-template `test.sh` plus shared `test-utils`
+- **Custom Images** live under `images/` and are auto-built/published to GHCR ([see images/IMAGES.md](images/IMAGES.md))
 
 ## How to Use
 
