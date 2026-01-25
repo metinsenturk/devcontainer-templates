@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "=== Testing Installed Tools ==="
+echo "Run date: $(date -Is)"
 echo
 echo "Documentation: Tools included in python_playground2 devcontainer"
 echo "================================================================"
