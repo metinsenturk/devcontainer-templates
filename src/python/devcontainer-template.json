@@ -1,6 +1,6 @@
 {
     "id": "python",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "Python",
     "description": "A Python development environment powered by the simple-python custom image.",
     "documentationURL": "https://github.com/metinsenturk/devcontainer-templates/tree/main/src/python",
