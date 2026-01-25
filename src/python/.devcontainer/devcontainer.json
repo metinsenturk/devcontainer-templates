@@ -2,6 +2,7 @@
 	"name": "Python Development",
 	"image": "ghcr.io/metinsenturk/devcontainer-templates/simple-python:${templateOption:imageVariant}",
 	"workspaceFolder": "/workspace",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
 	
 	"customizations": {
 		"vscode": {
