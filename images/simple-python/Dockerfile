@@ -32,12 +32,12 @@ RUN groupadd --gid $USER_GID $USERNAME \
 RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
+# === Install Starship ===
+RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
+
 # === Set User Environment ===
 USER $USERNAME
 WORKDIR /workspace
-
-# === Install Starship ===
-RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
 
 # === Configure Zsh with Starship ===
 RUN echo 'eval "$(starship init zsh)"' >> ~/.zshrc
