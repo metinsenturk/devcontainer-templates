@@ -26,6 +26,19 @@ Minimal Python development image with essential tools. **✅ Fully tested and va
 - `gcc`, `g++`, `make` - C/C++ compiler and build tools
 - `build-essential` - meta-package for compilation
 
+**Python Development Tools (via pipx):**
+- `virtualenv` - Virtual environment management
+- `black` - Code formatter
+- `ruff` - Fast Python linter and formatter
+- `flake8` - Style guide enforcement
+- `mypy` - Static type checker
+- `isort` - Import statement organizer
+- `pylint` - Code analyzer
+- `pipenv` - Dependency management
+- `poetry` - Poetry package manager
+- `tox` - Testing automation
+- `nox` - Flexible test automation
+
 **Utilities:**
 - `curl` - data transfer and downloads
 - `ssh`, `scp`, `sftp` - SSH tools (openssh-client)
@@ -66,7 +79,7 @@ docker build -t simple-python:test -f images/simple-python/Dockerfile images/sim
 
 ## Testing
 
-Run included test suite (23 assertions):
+Run included test suite (35 assertions):
 
 ```bash
 docker run --rm \
@@ -76,9 +89,9 @@ docker run --rm \
   bash /tests/test.sh
 ```
 
-Expected output: **All 23 tests pass** ✅
+Expected output: **All 35 tests pass** ✅
 
-Covers: Python, pip, git, gcc, g++, make, curl, ssh, gpg, sudo, bash, grep, sed, awk, find, vscode user, sudoer privileges.
+Covers: Python, pip, git, gcc, g++, make, curl, ssh, gpg, sudo, bash, grep, sed, awk, find, virtualenv, autopep8, black, ruff, flake8, mypy, isort, pylint, pipenv, poetry, tox, nox, vscode user, sudoer privileges.
 
 ## Version
 

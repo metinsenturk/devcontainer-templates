@@ -16,6 +16,7 @@ RUN apt-get update && \
         gnupg \
         build-essential \
         sudo \
+        pipx \
     && rm -rf /var/lib/apt/lists/*
 
 # === Create Non-Root User ===
@@ -33,5 +34,22 @@ RUN echo "$USERNAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
 # === Set User Environment ===
 USER $USERNAME
 WORKDIR /workspace
+
+# === Install Pipx Packages ===
+RUN pipx install virtualenv && \
+    pipx install autopep8 && \
+    pipx install black && \
+    pipx install ruff && \
+    pipx install flake8 && \
+    pipx install mypy && \
+    pipx install isort && \
+    pipx install pylint && \
+    pipx install pipenv && \
+    pipx install poetry && \
+    pipx install tox && \
+    pipx install nox
+
+# === Update PATH for Pipx Binaries ===
+ENV PATH="/home/vscode/.local/bin:${PATH}"
 
 CMD ["/bin/bash"]

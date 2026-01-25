@@ -28,6 +28,20 @@ check "sed available" sed --version
 check "awk available" awk 'BEGIN { print "OK" }'
 check "find available" find --version
 
+# === Pipx Tools ===
+check "virtualenv installed" virtualenv --version
+check "autopep8 installed" autopep8 --version
+check "black installed" black --version
+check "ruff installed" ruff --version
+check "flake8 installed" flake8 --version
+check "mypy installed" mypy --version
+check "isort installed" isort --version
+check "pylint installed" pylint --version
+check "pipenv installed" pipenv --version
+check "poetry installed" poetry --version
+check "tox installed" tox --version
+check "nox installed" nox --version
+
 # === User Setup ===
 check "vscode user exists" id vscode
 check "vscode sudoer" test -f /etc/sudoers.d/vscode
