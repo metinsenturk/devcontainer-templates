@@ -19,7 +19,7 @@ Python development environment with uv package manager (via devcontainers-extra 
 - Devcontainer-based Python setup with `uv` managing environments and dependencies (`pyproject.toml` + `uv.lock`).
 - VS Code + Pylance plus pre-installed extensions: Ruff (lint/format/imports), Mypy (types), Jupyter.
 - Post-create flow: verifies tools → installs Python → initializes project (if needed) → syncs dependencies.
-- Logs available at `/tmp/test-tools.log`, `/tmp/init.log`, and `/tmp/uv-sync.log` for debugging post-create issues.
+- Logs available at `/tmp/test-tools.log`, `/tmp/init.log`, `/tmp/jupyter-kernel.log`, and `/tmp/uv-sync.log` for debugging post-create issues.
 
 ## Devcontainer Setup
 - Base: Ubuntu image (`mcr.microsoft.com/devcontainers/base:ubuntu`) with `uv` feature for fast, reproducible environments.
@@ -29,16 +29,15 @@ Python development environment with uv package manager (via devcontainers-extra 
 - Devcontainer config in `.devcontainer/devcontainer.json`:
   - Extensions: Python, Pylance, Ruff, Mypy, Jupyter
   - Post-create command: `make post-create`
-  - Environment variables: `PROJECT_NAME`, `PYTHON_VERSION`, `UV_INIT_BARE`, `INSTALL_IPYKERNEL` (driven by `useJupyter`)
+  - Environment variables: `PROJECT_NAME`, `PYTHON_VERSION`, `UV_INIT_BARE`, `INSTALL_IPYKERNEL` (set from `useJupyter`)
 
 ## Makefile Commands
 The template includes a `Makefile` with the following targets:
 
 - `make post-create`: Full initialization sequence (test-tools → init → ensure-ipykernel → sync)
-  - `INSTALL_IPYKERNEL` is set from the `useJupyter` option; when true, `ipykernel` is installed as a dev dependency
+- `make ensure-ipykernel`: Installs `ipykernel` as a dev dependency only if missing (controlled via `INSTALL_IPYKERNEL`) → logs to `/tmp/jupyter-kernel.log`
 - `make test-tools`: Verifies installed tools (uv, Python, bash, git, etc.) → logs to `/tmp/test-tools.log`
 - `make init`: Installs Python via `uv python install`, creates minimal `pyproject.toml` if missing (uses `--bare` by default) → logs to `/tmp/init.log`
-- `make ensure-ipykernel`: Installs `ipykernel` if missing (controlled by `INSTALL_IPYKERNEL`) → logs to `/tmp/jupyter-kernel.log`
 - `make sync`: Runs `uv sync` to install dependencies → logs to `/tmp/uv-sync.log`
 - `make lint`: Runs `uv run ruff check .`
 - `make format`: Runs `uv run ruff format .`
@@ -59,11 +58,22 @@ The template includes a `Makefile` with the following targets:
   - `uv run` ensures commands execute in the managed `.venv`
 - Configuration: Add tool settings to `pyproject.toml` (e.g., `[tool.ruff]`, `[tool.mypy]`)
 
+## VS Code Configuration
+- `.vscode/settings.json` pre-configured with:
+  - **Formatter:** Ruff with format-on-save (automatic code formatting on every save)
+  - **Import organization:** Automatic import sorting on save (groups stdlib, third-party, local)
+  - **Auto-fixes:** Ruff fixable issues on save (unused imports, whitespace, etc.)
+  - **Interpreter:** `.venv/bin/python` (points to managed environment created by `uv sync`)
+  - **Type checking:** Mypy real-time feedback via mypy-type-checker extension
+  - **Tool configs:** Ruff and Mypy configured to read from `pyproject.toml` for consistency
+- **Result:** Real-time code quality feedback on save; no manual `make` commands needed for formatting/fixes
+
 ## Template Options
 - `projectName`: Workspace display name (default: "Python + uv")
 - `imageName`: Docker image/container name (default: "python_playground")
 - `pythonVersion`: Python version to install (default: "3.13"; options: 3.11-3.14)
 - `bare`: Use minimal `uv init --bare` mode (default: true; creates only `pyproject.toml`)
+- `useJupyter`: Enable Jupyter notebooks; installs `ipykernel` during post-create (default: true)
 
 ## File Structure
 - `.devcontainer/devcontainer.json`: Container definition, extensions, environment variables, post-create command
