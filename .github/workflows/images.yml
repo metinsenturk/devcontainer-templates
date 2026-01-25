@@ -27,7 +27,7 @@ jobs:
         id: detect
         run: |
           images=$(find images -maxdepth 1 -type d ! -name 'images' -printf '%f\n' | sort)
-          json_array=$(echo "$images" | jq -R . | jq -s .)
+          json_array=$(echo "$images" | jq -R . | jq -s -c .)
           echo "changes=$json_array" >> $GITHUB_OUTPUT
 
   build:
