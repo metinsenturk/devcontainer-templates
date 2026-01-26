@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: devcontainer_templates
+    container_name: devcontainer_templates
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
