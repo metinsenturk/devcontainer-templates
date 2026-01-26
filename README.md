@@ -1,49 +1,26 @@
 # Devcontainer Templates
 
-Lightweight devcontainer templates for Python projects:
+This repository hosts **devcontainer templates** and **custom container images** for Python development. It provides lightweight templates for Python projects:
 
-- `python`: classic pip/venv on Ubuntu base
+- `python`: classic pip/venv on Debian base
 - `python-uv`: uv-managed Python on Ubuntu base
 
-## What's Here
+Custom images are automatically built and published to GitHub Container Registry (GHCR). Current images are:
 
-- **Templates** live under `src/` with their `.devcontainer` configs
-- **Tests** live under `test/` with per-template `test.sh` plus shared `test-utils`
-- **Custom Images** live under `images/` and are auto-built/published to GHCR ([see images/IMAGES.md](images/IMAGES.md))
+- `simple-python`: Minimal python image with essential dev tools, [pipx](https://github.com/pypa/pipx) packages, Git, and [Zsh](https://www.zsh.org/) with [Starship](https://starship.rs/)
 
-## How to Use
-
-### VS Code
-1) Open the Command Palette → “Dev Containers: Add Dev Container Configuration Files…”.
-2) Select where to add the configuration files (e.g., current workspace folder).
-3) Choose a container configuration template or select “Enter custom template ID”, then paste:
-	- `ghcr.io/metinsenturk/devcontainer-templates/python-uv:latest`
-4) Complete the questionnaire from the template (options and defaults).
-5) Optionally add more features when prompted.
-6) Finish and files will appear in the current folder.
-
-### CLI
-```
-devcontainer templates apply --template-id ${TEMPLATE-ID} --template-repo https://github.com/metinsenturk/devcontainer-templates
-```
 
 ## Template Highlights
 
-| Template ID | Package manager | Python install | Extras |
-|-------------|-----------------|----------------|--------|
-| python      | pip + venv      | System Python  | VS Code Python + Pylance extensions |
-| python-uv   | uv              | `uv python install` (version option) | Makefile (`post-create`, `sync`, `lint`, `type-check`), optional Jupyter |
+| Template ID | Use Case | Containers | Image Build | Package manager | Python install | Extras |
+|-------------|----------|-----------|-------------|-----------------|----------------|--------|
+| python      | Quick Python development with Python | Single container | No (uses pre-built image) | pip + venv | Python 3.13 | VS Code Python + Pylance extensions, Zsh + Starship |
+| python-uv   | Modern Python development with version management | Container group (Docker Compose) | Yes (builds from Dockerfile) | uv | `uv python install` (configurable) | Makefile, optional Jupyter, VS Code extensions |
 
-## Testing Locally
 
-Open this repository in its own Dev Container, then run the smoke tests per template.
+## Learn More
 
-Note: The build step is required because it prepares `/tmp/${TEMPLATE-ID}` by copying the template sources, injecting the test assets into `test-project/`, installing the Dev Containers CLI, and starting the dev container. The test step then executes `test-project/test.sh` inside that running container.
-
-```
-./.github/actions/smoke-test/build.sh ${TEMPLATE-ID}
-./.github/actions/smoke-test/test.sh ${TEMPLATE-ID}
-```
+For detailed information on how to use templates, testing locally, and advanced topics, see [MORE.md](MORE.md).
 
 ## Publishing
 
