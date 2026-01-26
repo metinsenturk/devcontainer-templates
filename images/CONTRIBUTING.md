@@ -1,17 +1,14 @@
-# Custom Container Images
+# Contributing a New Container Image
 
-This directory contains custom container images that can be used independently or referenced by devcontainer templates in this repository.
+This guide explains how to add a new custom container image to this repository.
 
-## System Overview
+## Prerequisites
 
-Images are automatically built and published to GitHub Container Registry (GHCR) when changes are detected in the `images/` directory. Each image is:
+- Docker installed locally for testing
+- Basic understanding of Dockerfile syntax
+- GitHub account with access to this repository
 
-- **Multi-arch**: Built for `linux/amd64` and `linux/arm64`
-- **Attested**: Includes provenance and SBOM
-- **Scanned**: Trivy security scan on every build
-- **Versioned**: Tagged with semantic versions and `latest`
-
-## Creating a New Image
+## Step-by-Step Guide
 
 ### 1. Create Image Directory
 
@@ -29,7 +26,7 @@ Each image directory must contain:
 - **`.dockerignore`**: Files to exclude from build context
 - **`README.md`**: Usage documentation
 
-**Dockerfile template:**
+#### Dockerfile Template
 
 ```dockerfile
 FROM <base-image>
@@ -62,9 +59,19 @@ WORKDIR /workspace
 CMD ["/bin/bash"]
 ```
 
-**`.dockerignore` template** (copy from `images/simple-python/.dockerignore`)
+#### .dockerignore Template
 
-**`README.md` template:**
+Copy from `images/simple-python/.dockerignore`:
+
+```
+**/.git
+**/.gitignore
+**/.vscode
+**/README.md
+**/test.sh
+```
+
+#### README.md Template
 
 ```markdown
 # my-image
@@ -88,26 +95,7 @@ docker pull ghcr.io/metinsenturk/devcontainer-templates/my-image:latest
 Current: `1.0.0` (or use a tag that describes your image, e.g., Python version `3.13`)
 ```
 
-### 3. Register in CI Workflow
-
-Edit `.github/workflows/images.yml` and add your image to the `detect-changes` job filters:
-
-```yaml
-detect-changes:
-  # ...
-  steps:
-    # ...
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        filters: |
-          simple-python:
-            - 'images/simple-python/**'
-          my-image:  # Add this
-            - 'images/my-image/**'
-```
-
-### 4. Create Tests for Your Image (Optional but Recommended)
+### 3. Create Tests (Optional but Recommended)
 
 Tests ensure your image contains all expected tools and functionality. Place tests in `test/images/my-image/test.sh`:
 
@@ -143,15 +131,51 @@ The test script uses shared utilities from `test/test-utils/test-utils.sh` with:
     bash /tests/test.sh
   ```
 
+### 4. Local Testing
+
+Build and test locally before pushing:
+
+```bash
+# Build single-arch (fast)
+docker build -t my-image:test -f images/my-image/Dockerfile images/my-image
+
+# Test interactively
+docker run -it --rm my-image:test
+
+# Run tests (if created)
+docker run --rm \
+  -v $(pwd)/test/images/my-image:/tests \
+  -v $(pwd)/test/test-utils:/utils \
+  my-image:test \
+  bash /tests/test.sh
+```
+
+For multi-arch testing (requires Docker buildx):
+
+```bash
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t my-image:test \
+  -f images/my-image/Dockerfile images/my-image
+```
+
+Security scan:
+
+```bash
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+  aquasec/trivy:latest image my-image:test
+```
+
 ### 5. Commit and Push
 
 ```bash
 git add images/my-image
+git add test/images/my-image  # if tests created
 git commit -m "feat: add my-image container image"
 git push
 ```
 
-The CI workflow will:
+The CI workflow will automatically:
 1. Detect changes in `images/my-image/`
 2. Build for `linux/amd64` and `linux/arm64`
 3. Run tests from `test/images/my-image/test.sh` (if present)
@@ -161,7 +185,7 @@ The CI workflow will:
 
 ## Versioning
 
-Images follow **semantic versioning**:
+Images follow **semantic versioning** (or use meaningful tags like Python versions):
 
 - **Major** (1.x.x): Breaking changes
 - **Minor** (x.1.x): New features, backward-compatible
@@ -174,55 +198,9 @@ Update the version in:
 The CI generates tags automatically:
 - `latest` (main branch only)
 - `1.0.0` (specific version, or your chosen version tag like `3.13`)
-- `1.0` (minor version, or applicable major.minor if using semantic versioning)
-- `1` (major version, or major only if using semantic versioning)
+- `1.0` (minor version, if using semantic versioning)
+- `1` (major version, if using semantic versioning)
 - `main-<sha>` (branch + commit)
-
-## Local Testing
-
-Build locally before pushing:
-
-```bash
-# Single-arch (fast)
-docker build -t my-image:test -f images/my-image/Dockerfile images/my-image
-
-# Multi-arch (requires buildx)
-docker buildx build \
-  --platform linux/amd64,linux/arm64 \
-  -t my-image:test \
-  -f images/my-image/Dockerfile images/my-image
-```
-
-Run and test:
-
-```bash
-docker run -it --rm my-image:test
-```
-
-Scan for vulnerabilities:
-
-```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-  aquasec/trivy:latest image my-image:test
-```
-
-## Using Images in Devcontainer Templates
-
-Reference your published image in `src/<template>/.devcontainer/devcontainer.json`:
-
-```json
-{
-  "image": "ghcr.io/metinsenturk/devcontainer-templates/my-image:latest"
-}  # or pin to specific version, e.g., my-image:1.0.0 or my-image:3.13
-```
-
-Or use `latest` for auto-updates (less reproducible):
-
-```json
-{
-  "image": "ghcr.io/metinsenturk/devcontainer-templates/my-image:latest"
-}
-```
 
 ## Best Practices
 
@@ -248,12 +226,6 @@ Or use `latest` for auto-updates (less reproducible):
 
 8. **Security scan**: Check Trivy results in GitHub Security tab
 
-## Available Images
-
-| Image | Description | Status | GHCR URL |
-|-------|-------------|--------|----------|
-| simple-python | Minimal Python with essential tools | ✅ Tested (23/23 checks) | `ghcr.io/metinsenturk/devcontainer-templates/simple-python` |
-
 ## Troubleshooting
 
 **Build fails with "no space left on device"**
@@ -273,44 +245,20 @@ Or use `latest` for auto-updates (less reproducible):
 - Verify test script uses `source /utils/test-utils.sh` (absolute path)
 - Check Docker run command mounts test-utils: `-v $(pwd)/test/test-utils:/utils`
 
-## Test Suite Examples
+## Using Your Image in Devcontainer Templates
 
-### simple-python Test Coverage
+After your image is published, reference it in `src/<template>/.devcontainer/devcontainer.json`:
 
-The `simple-python` image includes comprehensive testing covering 23 assertions:
+```json
+{
+  "image": "ghcr.io/metinsenturk/devcontainer-templates/my-image:1.0.0"
+}
+```
 
-**Development & Python (3 checks)**
-- python installed and functional (3.13.11)
-- pip installed and functional
-- python code execution
+Or use `latest` for auto-updates (less reproducible):
 
-**Version Control (1 check)**
-- git installed (2.39.5)
-
-**Build Tools (3 checks)**
-- gcc installed (12.2.0)
-- g++ installed (12.2.0)
-- make installed (4.3)
-
-**Utilities (4 checks)**
-- curl installed (7.88.1)
-- ssh installed (9.2p1)
-- gpg installed (2.2.40)
-- sudo installed (1.9.13p3)
-
-**Shell & Text Processing (5 checks)**
-- bash installed (5.2.15)
-- grep available (3.8)
-- sed available (4.9)
-- awk available (working with `awk 'BEGIN { print "OK" }'`)
-- find available (9.0)
-
-**User Setup (2 checks)**
-- vscode user exists (UID 1000)
-- vscode has sudoer privileges
-
-All 23 tests pass successfully on both linux/amd64 and linux/arm64 architectures.
-
-## License
-
-All images inherit the repository license (MIT).
+```json
+{
+  "image": "ghcr.io/metinsenturk/devcontainer-templates/my-image:latest"
+}
+```
