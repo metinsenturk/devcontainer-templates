@@ -28,6 +28,13 @@ check "sed available" sed --version
 check "awk available" awk 'BEGIN { print "OK" }'
 check "find available" find --version
 
+# === Zsh & Starship ===
+check "zsh installed" zsh --version
+check "starship installed" starship --version
+check "vscode default shell is zsh" grep "^vscode:.*:/bin/zsh" /etc/passwd
+check "current shell is zsh" test "$(basename $SHELL)" = "zsh"
+check "starship configured in zshrc" grep -q "starship init zsh" /home/vscode/.zshrc
+
 # === Pipx Tools ===
 check "virtualenv installed" virtualenv --version
 check "autopep8 installed" autopep8 --version
