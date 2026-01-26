@@ -1,6 +1,6 @@
 {
     "id": "python-uv",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "name": "Python + uv",
     "description": "Python development environment with uv package manager (via devcontainers-extra feature).",
     "documentationURL": "https://github.com/metinsenturk/devcontainer-templates/tree/main/src/python-uv",

@@ -1,9 +1,12 @@
 #!/bin/bash
 
+PROJECT_NAME=${PROJECT_NAME:-Python + uv}
+
 echo "=== Testing Installed Tools ==="
 echo "Run date: $(date -Is)"
 echo
-echo "Documentation: Tools included in python_playground2 devcontainer"
+
+echo "Documentation: Tools included in ${PROJECT_NAME} devcontainer"
 echo "================================================================"
 echo
 echo "Core Tools (from Ubuntu base + uv feature):"
@@ -62,7 +65,6 @@ echo
 echo "=== Test Complete ==="
 
 # Final summary
-PROJECT_NAME=${PROJECT_NAME:-Python + uv}
 echo "✅ Apps are ready for '${PROJECT_NAME}'"
 echo "   Using python-uv devcontainer template"
 echo "   https://github.com/metinsenturk/devcontainer-templates/tree/main/src/python-uv"
