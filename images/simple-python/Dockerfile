@@ -51,6 +51,7 @@ RUN pipx install virtualenv && \
     pipx install mypy && \
     pipx install isort && \
     pipx install pylint && \
+    pipx install uv && \
     pipx install pipenv && \
     pipx install poetry && \
     pipx install tox && \
