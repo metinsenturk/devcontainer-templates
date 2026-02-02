@@ -39,9 +39,6 @@ RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
 USER $USERNAME
 WORKDIR /workspace
 
-# === Configure Zsh with Starship ===
-RUN echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-
 # === Install Pipx Packages ===
 RUN pipx install virtualenv && \
     pipx install autopep8 && \
@@ -59,5 +56,8 @@ RUN pipx install virtualenv && \
 
 # === Update PATH for Pipx Binaries ===
 ENV PATH="/home/vscode/.local/bin:${PATH}"
+
+# === Configure Zsh ===
+COPY --chown=$USERNAME:$USERNAME .zshrc /home/vscode/.zshrc
 
 CMD ["/bin/zsh"]
