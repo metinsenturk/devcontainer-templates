@@ -58,6 +58,6 @@ RUN pipx install virtualenv && \
 ENV PATH="/home/vscode/.local/bin:${PATH}"
 
 # === Configure Zsh ===
-COPY --chown=$USERNAME:$USERNAME .zshrc /home/vscode/.zshrc
+COPY --chown=$USERNAME:$USERNAME .zshrc /home/${USERNAME}/.zshrc
 
 CMD ["/bin/zsh"]

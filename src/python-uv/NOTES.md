@@ -79,4 +79,4 @@ Post-create and command logs are saved to `/tmp/` for debugging:
 - `/tmp/uv-sync.log` - Dependency sync
 - `/tmp/gitignore.log` - .gitignore download
 - `/tmp/dev-tools.log` - Dev tools (ruff, mypy) installation
-- `/tmp/requirements.txt` - Create requirements file with pip freeze
+- `/tmp/requirements.txt` - Create requirements file with `uv pip freeze`

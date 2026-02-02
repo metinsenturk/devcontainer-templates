@@ -1,6 +1,6 @@
 # 🐍 simple-python
 
-A high-performance, python development container based on [official python image](https://hub.docker.com/_/python). A minimalistic but fully-loaded development environment.
+A high-performance, Python development container based on [official Python image](https://hub.docker.com/_/python). A minimalistic but fully-loaded development environment.
 
 ## 🎯 Project Goals
 
@@ -15,7 +15,7 @@ The goal of this image is to provide a "Goldilocks" environment for Python devel
 
 ---
 
-Why to use this image instead of [Microsoft Python Development Container Image](https://hub.docker.com/r/microsoft/devcontainers-python)? No reason, you can use it. I am just experiencing here with my own image.
+Why use this image instead of [Microsoft Python Development Container Image](https://hub.docker.com/r/microsoft/devcontainers-python)? No reason, you can use it. I am just experiencing here with my own image.
 
 ---
 

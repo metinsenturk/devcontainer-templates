@@ -8,7 +8,7 @@
 
 ## Pre-installed Development Tools
 
-See [README.md](../../images/simple-python/README.md) for `simple-python` image features and pre-installed tooling details.
+See [README.md](https://github.com/metinsenturk/devcontainer-templates/blob/main/images/simple-python/README.md) for `simple-python` image features and pre-installed tooling details.
 
 ## VS Code Extensions
 

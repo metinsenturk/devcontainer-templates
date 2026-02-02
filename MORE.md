@@ -19,7 +19,7 @@
 
 ### CLI
 ```
-devcontainer templates apply --TEMPLATE_ID ${TEMPLATE_ID} --template-repo https://github.com/metinsenturk/devcontainer-templates
+devcontainer templates apply --template-id ${TEMPLATE_ID} --template-repo https://github.com/metinsenturk/devcontainer-templates
 ```
 
 ## Testing Locally
