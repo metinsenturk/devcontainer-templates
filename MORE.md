@@ -19,16 +19,20 @@
 
 ### CLI
 ```
-devcontainer templates apply --template-id ${TEMPLATE-ID} --template-repo https://github.com/metinsenturk/devcontainer-templates
+devcontainer templates apply --TEMPLATE_ID ${TEMPLATE_ID} --template-repo https://github.com/metinsenturk/devcontainer-templates
 ```
 
 ## Testing Locally
 
 Open this repository in its own Dev Container, then run the smoke tests per template.
 
-Note: The build step is required because it prepares `/tmp/${TEMPLATE-ID}` by copying the template sources, injecting the test assets into `test-project/`, installing the Dev Containers CLI, and starting the dev container. The test step then executes `test-project/test.sh` inside that running container.
+Note: The build step is required because it prepares `/tmp/${TEMPLATE_ID}` by copying the template sources, injecting the test assets into `test-project/`, installing the Dev Containers CLI, and starting the dev container. The test step then executes `test-project/test.sh` inside that running container.
 
 ```
-./.github/actions/smoke-test/build.sh ${TEMPLATE-ID}
-./.github/actions/smoke-test/test.sh ${TEMPLATE-ID}
+# example id to run the test
+TEMPLATE_ID="python-uv"
+
+# run the build & testing
+./.github/actions/smoke-test/build.sh ${TEMPLATE_ID}
+./.github/actions/smoke-test/test.sh ${TEMPLATE_ID}
 ```
