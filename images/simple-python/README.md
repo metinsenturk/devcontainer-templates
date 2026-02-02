@@ -1,6 +1,6 @@
 # 🐍 simple-python
 
-A high-performance, development container based on `python:3.13-slim-bookworm`. It bridges the gap between a minimal runtime and a fully-loaded development environment.
+A high-performance, python development container based on [official python image](https://hub.docker.com/_/python). A minimalistic but fully-loaded development environment.
 
 ## 🎯 Project Goals
 

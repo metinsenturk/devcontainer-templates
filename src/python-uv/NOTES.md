@@ -1,5 +1,3 @@
-# Python + uv Template - Detailed Information
-
 ## Features
 
 - **Base Image**: Built from `mcr.microsoft.com/devcontainers/base:ubuntu` via Docker Compose
