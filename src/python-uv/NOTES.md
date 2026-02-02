@@ -35,6 +35,8 @@ The template includes a `Makefile` for common tasks:
 - **`make type-check`** - Run mypy type checker
 - **`make test-tools`** - Verify installed tools
 - **`make gitignore`** - Download Python .gitignore from GitHub
+- **`make dev-tools`** - Install dev tools (ruff, mypy)
+- **`make freeze`** - Freeze dependencies to tmp folder
 
 ## Template Options
 
@@ -76,3 +78,5 @@ Post-create and command logs are saved to `/tmp/` for debugging:
 - `/tmp/jupyter-kernel.log` - ipykernel installation
 - `/tmp/uv-sync.log` - Dependency sync
 - `/tmp/gitignore.log` - .gitignore download
+- `/tmp/dev-tools.log` - Dev tools (ruff, mypy) installation
+- `/tmp/requirements.txt` - Create requirements file with pip freeze
