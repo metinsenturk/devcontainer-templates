@@ -44,6 +44,7 @@ check "flake8 installed" flake8 --version
 check "mypy installed" mypy --version
 check "isort installed" isort --version
 check "pylint installed" pylint --version
+check "uv installed" uv --version
 check "pipenv installed" pipenv --version
 check "poetry installed" poetry --version
 check "tox installed" tox --version

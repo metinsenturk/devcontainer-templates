@@ -1,4 +1,4 @@
-.PHONY: post-create test-tools init sync lint format type-check gitignore
+.PHONY: post-create test-tools init sync lint format type-check gitignore freeze dev-tools ensure-ipykernel
 
 # Post-create command: run tool verification, init project, and sync dependencies
 post-create: test-tools init ensure-ipykernel sync
@@ -68,3 +68,16 @@ gitignore:
 		) > /tmp/gitignore.log 2>&1; \
 		echo "✓ .gitignore download complete (log: /tmp/gitignore.log)"; \
 	fi
+
+# Install dev tools (ruff, mypy)
+dev-tools:
+	@echo "Installing dev tools (ruff, mypy)..."
+	@uv add --dev ruff mypy > /tmp/dev-tools.log 2>&1
+	@echo "✓ Dev tools installed (log: /tmp/dev-tools.log)"
+
+# Freeze dependencies to tmp folder
+freeze:
+	@echo "Freezing dependencies..."
+	@echo "# Generated on $$(date)" > /tmp/requirements.txt
+	@uv pip freeze >> /tmp/requirements.txt
+	@echo "✓ Dependencies frozen (log: /tmp/requirements.txt)"

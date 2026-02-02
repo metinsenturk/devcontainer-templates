@@ -1,102 +1,88 @@
-# simple-python
+# 🐍 simple-python
 
-Minimal Python development image with essential tools. **✅ Fully tested and validated.**
+A high-performance, Python development container based on [official Python image](https://hub.docker.com/_/python). A minimalistic but fully-loaded development environment.
 
-## Features
+## 🎯 Project Goals
 
-- Base: `python:3.13-slim-bookworm`
-- Non-root user: `vscode` (UID 1000)
-- Pre-installed tools: git, curl, build-essential, openssh-client
-- Multi-arch: `linux/amd64`, `linux/arm64`
+The goal of this image is to provide a "Goldilocks" environment for Python development:
 
-## OS Info
+* **Small & Lean**: I like being minimalistic. Built on a `slim` base, this image maintains a minimal footprint by including only a hand-picked selection of essential tools, ensuring the environment remains lightweight, fast, and focused.
+* **Capable**: Includes `build-essential` and core headers so that common Python libraries (even those requiring C extensions) install and run without friction.
+* **Evolving**: This is a personal sandbox. It changes as my project needs change, making it ideal for rapid development across various personal projects.
 
-- **Distribution**: Debian GNU/Linux 12 (Bookworm)
-- **Architecture**: x86_64 (amd64) / aarch64 (arm64)
-- **Package Manager**: apt/apt-get
+> [!IMPORTANT]
+> **Note on Stability:** Because this image is tuned for active development and my personal workflow, it may change frequently. It is recommended for **development use only**, not for mission-critical production environments.
 
-## CLI Apps Available
+---
 
-**Development & Version Control:**
-- `python` - Python 3.13 interpreter
-- `pip` - Python package manager
-- `git` - version control
+Why use this image instead of [Microsoft Python Development Container Image](https://hub.docker.com/r/microsoft/devcontainers-python)? No reason, you can use it. I am just experiencing here with my own image.
 
-**Build & Compilation:**
-- `gcc`, `g++`, `make` - C/C++ compiler and build tools
-- `build-essential` - meta-package for compilation
+---
 
-**Python Development Tools (via pipx):**
-- `virtualenv` - Virtual environment management
-- `black` - Code formatter
-- `ruff` - Fast Python linter and formatter
-- `flake8` - Style guide enforcement
-- `mypy` - Static type checker
-- `isort` - Import statement organizer
-- `pylint` - Code analyzer
-- `pipenv` - Dependency management
-- `poetry` - Poetry package manager
-- `tox` - Testing automation
-- `nox` - Flexible test automation
+## 🚀 Quick Start
 
-**Utilities:**
-- `curl` - data transfer and downloads
-- `ssh`, `scp`, `sftp` - SSH tools (openssh-client)
-- `gpg` - encryption and signing
-- `sudo` - run commands as root
-- `bash`, `sh` - shells
-- `grep`, `sed`, `awk`, `cut`, `sort`, `find` - text/file processing
-- `cat`, `ls`, `mkdir`, `rm`, `cp`, `mv` - file operations
-- `apt-get` - package manager
+### Use in VS Code
 
-## Usage
-
-Pull from GHCR:
-
-```bash
-docker pull ghcr.io/metinsenturk/devcontainer-templates/simple-python:latest
-```
-
-Run interactively:
-
-```bash
-docker run -it --rm ghcr.io/metinsenturk/devcontainer-templates/simple-python:latest
-```
-
-Use in a devcontainer:
+Add this to your `.devcontainer/devcontainer.json`:
 
 ```json
 {
   "image": "ghcr.io/metinsenturk/devcontainer-templates/simple-python:3.13"
 }
+
 ```
 
-## Build Locally
+### Pull and Run
 
 ```bash
+docker pull ghcr.io/metinsenturk/devcontainer-templates/simple-python:latest
+docker run -it --rm ghcr.io/metinsenturk/devcontainer-templates/simple-python:latest
+
+```
+
+---
+
+## 🛠️ Image Specifications
+
+* **Base Image:** `python:3.13-slim-bookworm`
+* **Default Shell**: [Zsh](https://www.zsh.org/) with [Starship](https://starship.rs/) prompt customization.
+* **User Context:** Non-root `vscode` user (UID 1000) with `sudo` privileges.
+* **Architectures:** Multi-arch support for `amd64` and `arm64`.
+* **Core Tools:** `git`, `curl`, `build-essential` (gcc, g++, make), `openssh-client`, and `gpg`.
+
+---
+
+## 🐍 Python Toolkit (via pipx)
+
+The following tools are pre-installed in isolated environments for maximum stability:
+
+| Category | Tools |
+| --- | --- |
+| **Linting & Formatting** | [Ruff](https://github.com/astral-sh/ruff), [Black](https://github.com/psf/black), [Mypy](https://github.com/python/mypy), [Flake8](https://github.com/PyCQA/flake8), [Isort](https://github.com/PyCQA/isort), [Pylint](https://github.com/pylint-dev/pylint), [autopep8](https://github.com/hhatto/autopep8) |
+| **Project Management** | [uv](https://github.com/astral-sh/uv), [Poetry](https://github.com/python-poetry/poetry), [Pipenv](https://github.com/pypa/pipenv), [virtualenv](https://github.com/pypa/virtualenv) |
+| **Testing & Automation** | [Tox](https://github.com/tox-dev/tox), [Nox](https://github.com/wntrblm/nox) |
+
+---
+
+## 🧪 Validation & Testing
+
+This image is [tested and validated](../../test/images/simple-python/test.sh). Test script verifies Python environment, compiler toolchains, SSH/GPG utilities, all `pipx` tools, and `sudo` permissions.
+
+To run the tests locally:
+
+```bash
+# 1. Build the image
 docker build -t simple-python:test -f images/simple-python/Dockerfile images/simple-python
-```
 
-## Testing
-
-Run included test suite (35 assertions):
-
-```bash
+# 2. Execute the test suite
 docker run --rm \
   -v $(pwd)/test/images/simple-python:/tests \
   -v $(pwd)/test/test-utils:/utils \
   simple-python:test \
   bash /tests/test.sh
+
 ```
 
-Expected output: **All 35 tests pass** ✅
+## 📄 License
 
-Covers: Python, pip, git, gcc, g++, make, curl, ssh, gpg, sudo, bash, grep, sed, awk, find, virtualenv, autopep8, black, ruff, flake8, mypy, isort, pylint, pipenv, poetry, tox, nox, vscode user, sudoer privileges.
-
-## Version
-
-Current: `3.13`
-
-## License
-
-MIT
+Licensed under the **MIT License**.
