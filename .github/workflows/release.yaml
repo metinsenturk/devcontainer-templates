@@ -11,7 +11,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Publish Templates"
         uses: devcontainers/action@v1
@@ -41,7 +41,7 @@ jobs:
           message='Automated documentation update'
 
           # Add / update and commit
-          git add */**/README.md
+          git add src/*/README.md
           git commit -m 'Automated documentation update [skip ci]' || export NO_UPDATES=true
 
           # Push
