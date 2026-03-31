@@ -27,7 +27,7 @@ Add this to your `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "image": "ghcr.io/metinsenturk/devcontainer-templates/simple-python:3.13"
+  "image": "ghcr.io/metinsenturk/devcontainer-templates/simple-python:3.14"
 }
 
 ```
@@ -44,7 +44,8 @@ docker run -it --rm ghcr.io/metinsenturk/devcontainer-templates/simple-python:la
 
 ## 🛠️ Image Specifications
 
-* **Base Image:** `python:3.13-slim-bookworm`
+* **Base Image:** `python:3.14-slim-bookworm`
+* **Available Versions:** `3.12`, `3.13`, `3.14`
 * **Default Shell**: [Zsh](https://www.zsh.org/) with [Starship](https://starship.rs/) prompt customization.
 * **User Context:** Non-root `vscode` user (UID 1000) with `sudo` privileges.
 * **Architectures:** Multi-arch support for `amd64` and `arm64`.
