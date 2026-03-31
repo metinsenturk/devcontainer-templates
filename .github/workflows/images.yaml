@@ -137,7 +137,7 @@ jobs:
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.tags.outputs.tags }}
           build-args: |
-            ${{ matrix.build-arg && format('{0}={1}', matrix.build-arg, matrix.version) || '' }}
+            ${{ matrix['build-arg'] && format('{0}={1}', matrix['build-arg'], matrix.version) || '' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           cache-from: type=gha
