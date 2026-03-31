@@ -9,7 +9,9 @@ runs:
   steps:
     - name: Checkout main
       id: checkout_release
-        uses: actions/checkout@v4
+      uses: actions/checkout@v4
+
+    - name: Build template
       id: build_template
       shell: bash
       run: ${{ github.action_path }}/build.sh ${{ inputs.template }}
