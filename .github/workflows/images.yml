@@ -16,6 +16,17 @@ env:
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/devcontainer-templates
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Read each image's build.json and produce a matrix of what to build.
+  #
+  # Images WITH build.json get one matrix entry per version (e.g. 3.12, 3.13).
+  # Images WITHOUT build.json get a single entry with no version/build-arg.
+  #
+  # Example output for simple-python with build.json {"versions":["3.12","3.13","3.14"],"latest":"3.14"}:
+  #   { "image": "simple-python", "version": "3.12", "build-arg": "PYTHON_VERSION", "latest": false }
+  #   { "image": "simple-python", "version": "3.13", "build-arg": "PYTHON_VERSION", "latest": false }
+  #   { "image": "simple-python", "version": "3.14", "build-arg": "PYTHON_VERSION", "latest": true  }
+  # ---------------------------------------------------------------------------
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -23,36 +34,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate build matrix
+      - name: Generate build matrix from image directories
         id: matrix
         run: |
           matrix='[]'
           for dir in images/*/; do
             image=$(basename "$dir")
-            build_config="${dir}build.json"
+            config="${dir}build.json"
 
-            if [ -f "$build_config" ]; then
-              arg=$(jq -r '.arg' "$build_config")
-              latest=$(jq -r '.latest' "$build_config")
-
-              for version in $(jq -r '.versions[]' "$build_config"); do
-                is_latest=$( [ "$version" = "$latest" ] && echo "true" || echo "false" )
-                matrix=$(echo "$matrix" | jq -c \
-                  --arg img "$image" \
-                  --arg ver "$version" \
-                  --arg arg "$arg" \
-                  --arg is_latest "$is_latest" \
-                  '. + [{"image": $img, "version": $ver, "build-arg": $arg, "latest": ($is_latest == "true")}]')
-              done
+            if [ -f "$config" ]; then
+              # Read build.json and expand one entry per version
+              latest=$(jq -r '.latest' "$config")
+              matrix=$(jq -c \
+                --arg img "$image" \
+                --arg latest "$latest" \
+                --argjson existing "$matrix" \
+                '$existing + [.versions[] as $v | {
+                  image: $img,
+                  version: $v,
+                  "build-arg": .arg,
+                  latest: ($v == $latest)
+                }]' "$config")
             else
+              # No build.json — single build, no version arg
               matrix=$(echo "$matrix" | jq -c \
                 --arg img "$image" \
-                '. + [{"image": $img, "version": "", "build-arg": "", "latest": true}]')
+                '. + [{image: $img, version: "", "build-arg": "", latest: true}]')
             fi
           done
 
           echo "matrix={\"include\":$matrix}" >> $GITHUB_OUTPUT
 
+  # ---------------------------------------------------------------------------
+  # Job 2: Build, test, push, scan each image variant.
+  # ---------------------------------------------------------------------------
   build:
     needs: generate-matrix
     runs-on: ubuntu-latest
@@ -72,6 +87,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # --- Registry login (skipped on PRs) ---
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
@@ -80,40 +96,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # --- Compute Docker tags ---
+      # PR builds:   <image>:<version>-pr42  (or <image>:pr42 if no version)
+      # Main builds: <image>:<version>        (+ <image>:latest if this is the latest version)
       - name: Generate tags
         id: tags
+        env:
+          IMAGE: ${{ env.IMAGE_PREFIX }}/${{ matrix.image }}
+          VERSION: ${{ matrix.version }}
+          IS_LATEST: ${{ matrix.latest }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          IMAGE="${{ env.IMAGE_PREFIX }}/${{ matrix.image }}"
-          VERSION="${{ matrix.version }}"
-          IS_LATEST="${{ matrix.latest }}"
-          EVENT="${{ github.event_name }}"
-
-          tags=""
-          primary=""
-
-          if [ "$EVENT" = "pull_request" ]; then
-            if [ -n "$VERSION" ]; then
-              primary="${IMAGE}:${VERSION}-pr${{ github.event.pull_request.number }}"
-            else
-              primary="${IMAGE}:pr${{ github.event.pull_request.number }}"
-            fi
+          if [ "$IS_PR" = "true" ]; then
+            # PR: build a throwaway tag for testing
+            primary="${IMAGE}:${VERSION:+${VERSION}-}pr${PR_NUMBER}"
             tags="$primary"
+          elif [ -n "$VERSION" ]; then
+            # Push with version: tag as version, optionally also as latest
+            primary="${IMAGE}:${VERSION}"
+            tags="$primary"
+            [ "$IS_LATEST" = "true" ] && tags="${tags},${IMAGE}:latest"
           else
-            if [ -n "$VERSION" ]; then
-              primary="${IMAGE}:${VERSION}"
-              tags="$primary"
-              if [ "$IS_LATEST" = "true" ]; then
-                tags="${tags},${IMAGE}:latest"
-              fi
-            else
-              primary="${IMAGE}:latest"
-              tags="${primary},${IMAGE}:sha-${GITHUB_SHA::7}"
-            fi
+            # Push without version: tag as latest + short sha
+            primary="${IMAGE}:latest"
+            tags="${primary},${IMAGE}:sha-${GITHUB_SHA::7}"
           fi
 
           echo "tags=$tags" >> $GITHUB_OUTPUT
           echo "primary-tag=$primary" >> $GITHUB_OUTPUT
 
+      # --- Build (and push on main) ---
       - name: Build and push
         id: push
         uses: docker/build-push-action@v6
@@ -123,12 +136,14 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.tags.outputs.tags }}
-          build-args: ${{ matrix.build-arg != '' && format('{0}={1}', matrix.build-arg, matrix.version) || '' }}
+          build-args: |
+            ${{ matrix.build-arg && format('{0}={1}', matrix.build-arg, matrix.version) || '' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # --- Test (PRs only, if test script exists) ---
       - name: Run image tests
         if: github.event_name == 'pull_request' && hashFiles(format('test/images/{0}/test.sh', matrix.image)) != ''
         run: |
@@ -138,6 +153,7 @@ jobs:
             ${{ steps.tags.outputs.primary-tag }} \
             bash /tests/test.sh
 
+      # --- Attestation (main only) ---
       - name: Generate artifact attestation
         if: github.event_name != 'pull_request'
         uses: actions/attest-build-provenance@v1
@@ -146,6 +162,7 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
+      # --- Security scan ---
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
