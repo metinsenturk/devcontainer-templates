@@ -17,6 +17,7 @@ jobs:
 
   test:
     needs: [detect-changes]
+    if: needs.detect-changes.outputs.templates != '[]'
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:

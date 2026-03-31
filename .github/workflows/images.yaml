@@ -156,7 +156,7 @@ jobs:
       # --- Attestation (main only) ---
       - name: Generate artifact attestation
         if: github.event_name != 'pull_request'
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v4
         with:
           subject-name: ${{ env.IMAGE_PREFIX }}/${{ matrix.image }}
           subject-digest: ${{ steps.push.outputs.digest }}
