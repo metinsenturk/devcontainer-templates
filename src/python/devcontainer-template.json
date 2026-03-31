@@ -10,7 +10,9 @@
             "type": "string",
             "description": "Python version:",
             "proposals": [
+                "3.14",
                 "3.13",
+                "3.12",
                 "latest"
             ],
             "default": "latest"
