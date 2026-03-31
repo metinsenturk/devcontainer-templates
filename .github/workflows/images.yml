@@ -16,34 +16,55 @@ env:
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/devcontainer-templates
 
 jobs:
-  detect-changes:
+  generate-matrix:
     runs-on: ubuntu-latest
     outputs:
-      images: ${{ steps.detect.outputs.changes }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Detect image directories
-        id: detect
+
+      - name: Generate build matrix
+        id: matrix
         run: |
-          images=$(find images -maxdepth 1 -type d ! -name 'images' -printf '%f\n' | sort)
-          json_array=$(echo "$images" | jq -R . | jq -s -c .)
-          echo "changes=$json_array" >> $GITHUB_OUTPUT
+          matrix='[]'
+          for dir in images/*/; do
+            image=$(basename "$dir")
+            build_config="${dir}build.json"
+
+            if [ -f "$build_config" ]; then
+              arg=$(jq -r '.arg' "$build_config")
+              latest=$(jq -r '.latest' "$build_config")
+
+              for version in $(jq -r '.versions[]' "$build_config"); do
+                is_latest=$( [ "$version" = "$latest" ] && echo "true" || echo "false" )
+                matrix=$(echo "$matrix" | jq -c \
+                  --arg img "$image" \
+                  --arg ver "$version" \
+                  --arg arg "$arg" \
+                  --arg is_latest "$is_latest" \
+                  '. + [{"image": $img, "version": $ver, "build-arg": $arg, "latest": ($is_latest == "true")}]')
+              done
+            else
+              matrix=$(echo "$matrix" | jq -c \
+                --arg img "$image" \
+                '. + [{"image": $img, "version": "", "build-arg": "", "latest": true}]')
+            fi
+          done
+
+          echo "matrix={\"include\":$matrix}" >> $GITHUB_OUTPUT
 
   build:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.images != '[]' && needs.detect-changes.outputs.images != '' }}
+    needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        image: ${{ fromJSON(needs.detect-changes.outputs.images) }}
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
     permissions:
       contents: read
       packages: write
       id-token: write
       attestations: write
       security-events: write
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,19 +80,39 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_PREFIX }}/${{ matrix.image }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+      - name: Generate tags
+        id: tags
+        run: |
+          IMAGE="${{ env.IMAGE_PREFIX }}/${{ matrix.image }}"
+          VERSION="${{ matrix.version }}"
+          IS_LATEST="${{ matrix.latest }}"
+          EVENT="${{ github.event_name }}"
+
+          tags=""
+          primary=""
+
+          if [ "$EVENT" = "pull_request" ]; then
+            if [ -n "$VERSION" ]; then
+              primary="${IMAGE}:${VERSION}-pr${{ github.event.pull_request.number }}"
+            else
+              primary="${IMAGE}:pr${{ github.event.pull_request.number }}"
+            fi
+            tags="$primary"
+          else
+            if [ -n "$VERSION" ]; then
+              primary="${IMAGE}:${VERSION}"
+              tags="$primary"
+              if [ "$IS_LATEST" = "true" ]; then
+                tags="${tags},${IMAGE}:latest"
+              fi
+            else
+              primary="${IMAGE}:latest"
+              tags="${primary},${IMAGE}:sha-${GITHUB_SHA::7}"
+            fi
+          fi
+
+          echo "tags=$tags" >> $GITHUB_OUTPUT
+          echo "primary-tag=$primary" >> $GITHUB_OUTPUT
 
       - name: Build and push
         id: push
@@ -81,8 +122,8 @@ jobs:
           platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || 'linux/amd64,linux/arm64' }}
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: ${{ matrix.build-arg != '' && format('{0}={1}', matrix.build-arg, matrix.version) || '' }}
           provenance: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
           cache-from: type=gha
@@ -94,7 +135,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/test/images/${{ matrix.image }}:/tests \
             -v ${{ github.workspace }}/test/test-utils:/utils \
-            ${{ env.IMAGE_PREFIX }}/${{ matrix.image }}:latest \
+            ${{ steps.tags.outputs.primary-tag }} \
             bash /tests/test.sh
 
       - name: Generate artifact attestation
@@ -109,7 +150,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
         with:
-          image-ref: ${{ env.IMAGE_PREFIX }}/${{ matrix.image }}:${{ steps.meta.outputs.version }}
+          image-ref: ${{ steps.tags.outputs.primary-tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
 
