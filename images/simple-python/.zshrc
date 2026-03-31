@@ -2,7 +2,7 @@
 eval "$(starship init zsh)"
 
 # Completion
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -C
 
 # Word navigation with Ctrl+Arrow
 bindkey '^[[1;5C' forward-word      # Ctrl+Right
