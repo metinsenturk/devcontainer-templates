@@ -57,7 +57,7 @@ RUN pipx install virtualenv && \
     pipx install nox
 
 # === Update PATH for Pipx Binaries ===
-ENV PATH="/home/vscode/.local/bin:${PATH}"
+ENV PATH="/home/${USERNAME}/.local/bin:${PATH}"
 ENV PYTHON_VERSION=${PYTHON_VERSION}
 
 # === Configure Zsh ===
