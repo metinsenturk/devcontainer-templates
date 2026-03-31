@@ -1,8 +1,10 @@
-FROM python:3.13-slim-bookworm
+ARG PYTHON_VERSION=3.13
+FROM python:${PYTHON_VERSION}-slim-bookworm
 
+ARG PYTHON_VERSION
 LABEL org.opencontainers.image.title="simple-python"
 LABEL org.opencontainers.image.description="Minimal Python development image"
-LABEL org.opencontainers.image.version="3.13"
+LABEL org.opencontainers.image.version="${PYTHON_VERSION}"
 LABEL org.opencontainers.image.source="https://github.com/metinsenturk/devcontainer-templates"
 LABEL org.opencontainers.image.licenses="MIT"
 
@@ -56,6 +58,7 @@ RUN pipx install virtualenv && \
 
 # === Update PATH for Pipx Binaries ===
 ENV PATH="/home/vscode/.local/bin:${PATH}"
+ENV PYTHON_VERSION=${PYTHON_VERSION}
 
 # === Configure Zsh ===
 COPY --chown=$USERNAME:$USERNAME .zshrc /home/${USERNAME}/.zshrc

@@ -6,6 +6,7 @@ source /utils/test-utils.sh
 check "python installed" python --version
 check "pip installed" pip --version
 check "python basic functionality" python -c "print('OK')"
+check "python version matches" python -c "import sys; assert f'{sys.version_info.major}.{sys.version_info.minor}' == '$PYTHON_VERSION', f'Expected $PYTHON_VERSION but got {sys.version_info.major}.{sys.version_info.minor}'"
 
 # === Version Control ===
 check "git installed" git --version
