@@ -12,7 +12,7 @@ A Python development environment powered by the simple-python custom image.
 ## Features
 
 - **Base Image**: `ghcr.io/metinsenturk/devcontainer-templates/simple-python`
-- **Python**: Version 3.13 (configurable via `imageVariant` option) with pip
+- **Python**: Version 3.14 (configurable via `imageVariant` option) with pip. Available versions: `3.12`, `3.13`, `3.14`
 - **Shell**: [Zsh](https://www.zsh.org/) with [Starship](https://starship.rs/) prompt for enhanced terminal experience
 - **User**: Non-root `vscode` user with sudoer privileges
 - **Workspace**: Projects mounted to `/workspace` inside the container
@@ -28,6 +28,10 @@ This template comes with the following VS Code extensions pre-configured:
 - **ms-python.isort** - Import sorting
 - **ms-python.autopep8** - Code formatting
 - **ms-python.mypy-type-checker** - Type checking
+
+## User Configuration
+
+- **Remote User**: `vscode` (non-root with sudo privileges)
 
 ## Workspace Configuration
 
